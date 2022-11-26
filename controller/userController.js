@@ -1,5 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const session = require("express-session");
+
 const User = require('../model/User.model');
 
 exports.register = (req, res) => {
@@ -57,15 +59,27 @@ exports.login = (req, res) => {
                         message: "Error: identifiant/password incorrect"
                     });
                 }
+
                 res.status(200).json({
                     status: res.statusCode,
-                    userId: user.id,
-                    token: jwt.sign({
+                    userId: req.session.userId = user.id,
+                    token: req.session.token = jwt.sign({
                         userId: user.id
                     }, "SECRET_TOKEN_KEY", {
                         expiresIn: "24h"
                     })
                 });
+
+                // res.status(200).json({
+                //     status: res.statusCode,
+                //     userId: user.id,
+                //     token: jwt.sign({
+                //         userId: user.id
+                //     }, "SECRET_TOKEN_KEY", {
+                //         expiresIn: "24h"
+                //     })
+                // });
+
             }).catch(err => {
                 res.status(500).json({
                     status: res.statusCode,
@@ -109,26 +123,26 @@ exports.findById = (req, res) => {
 };
 
 exports.logout = (req, res) => {
-    // if (!req.session.user) {
-    //     return res.status(400).json({
-    //         status: res.statusCode,
-    //         message: "Error: session not found"
-    //     });
-    // } else {
-    //     req.session.destroy(err => {
-    //         if (!err) {
-    //             return res.status(200).json({
-    //                 status: res.statusCode,
-    //                 message: "Success: logout"
-    //             });
-    //         } else {
-    //             return res.status(400).json({
-    //                 status: res.statusCode,
-    //                 message: err
-    //             });
-    //         }
-    //     });
-    // }
+    if (!req.session.userId) {
+        return res.status(400).json({
+            status: res.statusCode,
+            message: "Error: session not found"
+        });
+    } else {
+        req.session.destroy(err => {
+            if (!err) {
+                return res.status(200).json({
+                    status: res.statusCode,
+                    message: "Success: logout"
+                });
+            } else {
+                return res.status(400).json({
+                    status: res.statusCode,
+                    message: err
+                });
+            }
+        });
+    }
 };
 
 exports.update = (req, res) => { };

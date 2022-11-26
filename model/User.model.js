@@ -28,5 +28,8 @@ const User = sequelize.define('user', {
 });
 
 User.hasMany(Ad, { foreignKey: 'id_user' });
+// User.hasMany(Rate, { foreignKey: 'id_user' });
+// User.hasMany(Offer, { foreignKey: 'id_user' });
+// User.hasMany(Order, { foreignKey: 'id_user' });
 
 module.exports = User;

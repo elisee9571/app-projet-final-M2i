@@ -22,5 +22,8 @@ Ad.hasMany(Image, {
     foreignKey: 'id_ad',
     onDelete: 'CASCADE'
 });
+// Ad.hasOne(Rate, { foreignKey: 'id_ad' });
+// Ad.hasMany(Offer, { foreignKey: 'id_ad' });
+// Ad.hasOne(Order, { foreignKey: 'id_ad' });
 
 module.exports = Ad;
