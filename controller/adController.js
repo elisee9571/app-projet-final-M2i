@@ -27,7 +27,12 @@ exports.create = (req, res) => {
 };
 
 exports.find = (req, res) => {
-    Ad.findAll().then(ads => {
+    Ad.findAll({
+        order: [
+            ['id', 'DESC'],
+            // ['created_at', 'DESC']
+        ]
+    }).then(ads => {
 
         if (!ads) {
             return res.status(400).json({ message: "ads not found" });
@@ -101,7 +106,7 @@ exports.update = (req, res) => {
                                 url: images[i].url,
                                 id_ad: adItem.id
                             }
-                        }).then(() => console.log('update image')).catch(err => res.status(400).json({ err }));
+                        }).then().catch(err => res.status(400).json({ err }));
                     }
                 }
 

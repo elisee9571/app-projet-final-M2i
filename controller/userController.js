@@ -60,25 +60,25 @@ exports.login = (req, res) => {
                     });
                 }
 
-                res.status(200).json({
-                    status: res.statusCode,
-                    userId: req.session.userId = user.id,
-                    token: req.session.token = jwt.sign({
+                req.session.regenerate(function (err) {
+                    if (err) next(err)
+
+                    req.session.token = jwt.sign({
                         userId: user.id
                     }, "SECRET_TOKEN_KEY", {
                         expiresIn: "24h"
-                    })
-                });
+                    });
 
-                // res.status(200).json({
-                //     status: res.statusCode,
-                //     userId: user.id,
-                //     token: jwt.sign({
-                //         userId: user.id
-                //     }, "SECRET_TOKEN_KEY", {
-                //         expiresIn: "24h"
-                //     })
-                // });
+                    req.session.save(function (err) {
+                        if (err) return next(err);
+
+                        res.status(200).json({
+                            status: res.statusCode,
+                            token: req.session.token
+                        });
+
+                    });
+                });
 
             }).catch(err => {
                 res.status(500).json({
@@ -123,24 +123,23 @@ exports.findById = (req, res) => {
 };
 
 exports.logout = (req, res) => {
-    if (!req.session.userId) {
-        return res.status(400).json({
+    if (!req.session.token) {
+        res.status(400).json({
             status: res.statusCode,
             message: "Error: session not found"
         });
     } else {
-        req.session.destroy(err => {
-            if (!err) {
-                return res.status(200).json({
+        req.session.token = null;
+        req.session.save(function (err) {
+            if (err) next(err);
+
+            req.session.regenerate(function (err) {
+                if (err) next(err);
+                res.status(200).json({
                     status: res.statusCode,
                     message: "Success: logout"
                 });
-            } else {
-                return res.status(400).json({
-                    status: res.statusCode,
-                    message: err
-                });
-            }
+            });
         });
     }
 };
